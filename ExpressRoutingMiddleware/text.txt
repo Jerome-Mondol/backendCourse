@@ -1,0 +1,16 @@
+// Express.js is a framework
+
+
+// Intro to Express.js
+// Express.js is a npm package
+// is a framework
+
+
+
+
+
+// Setting up basic Express.js app
+// Routing
+// Middleware
+// Req and res handling
+// Error handling

@@ -1,0 +1,24 @@
+// npm understanding
+
+// npm -> old full form ==> node package manager | new full form ==> (no full form)
+// already download things with node ==> module | downloaded by npm (npm install) ==> package
+
+
+
+// installing and uninstalling anything basics and advanced
+
+// install --> npm i or npm install (package name)
+// uninstall --> npm uninstall (package name)
+
+
+
+// understanding node_modules --> all files and folders of any installed packages stays in it
+// dependencies --> packages and packages dependent on
+// devdependencies --> only needed in development
+
+
+
+// scripts
+// npm start
+// npm run dev
+
