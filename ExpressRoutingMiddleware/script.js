@@ -7,13 +7,18 @@ app.use((req, res, next) => {
     next()
 })
 
-
-app.get("/", (req, res) => {
-    res.send("Hello from Jerome!!")
+app.get("/", (req, res, next) => {
+    return next(new Error("Something went wrong"))
 })
 
 app.get("/profile", (req, res) => {
     res.send("Hello from Profile page heloooo")
+})
+
+
+app.use((err, req, res, next) => {
+    console.error(err.stack)
+    res.status(500).send('Something broke!')
 })
 
 app.listen(3000, () => {
