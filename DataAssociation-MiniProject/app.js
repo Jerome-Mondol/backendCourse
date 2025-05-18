@@ -1,10 +1,90 @@
-const express = require('express');
-const app = express();  
+const express      = require('express');
+const app          = express();  
+const cookieParser = require('cookie-parser');
+const bcrypt       = require('bcrypt');
+const jwt          = require('jsonwebtoken');
+const secret       = "de71f8e46a8f4e5"
+const userModel    = require('./models/user');
+const postModel    = require('./models/post');
 
+
+app.set("view engine", "ejs");
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(cookieParser())
 
 app.get("/", (req, res) => {
-    res.send("Hello World"); 
+    res.render("index"); 
 })
+
+app.get("/login", (req, res) => {
+    res.render("login"); 
+})
+
+app.get("/logout", (req, res) => {
+    res.cookie("token", "")
+    res.redirect("/login"); 
+});
+
+
+app.post("/register",async(req, res) => {
+    let { username, name, age, email, password } = req.body;
+
+    let user = await userModel.findOne({email})
+    if(user) {
+        return res.status(400).json({ message: "User already exists" });
+    }
+
+    bcrypt.genSalt(10, (err, salt) => {
+        bcrypt.hash(password, salt, async (err, hash) => {
+            let user = await userModel.create({
+                username,
+                name,
+                age,
+                email,
+                password: hash
+            })
+
+            let token = jwt.sign({email: email, userid: user._id}, secret)
+            res.cookie("token", token)
+            res.send("User registered successfully");
+
+        })
+    })
+})
+
+app.post("/login",async(req, res) => {
+    let { email, password } = req.body;
+
+    let user = await userModel.findOne({email})
+    if(!user) {
+        return res.status(400).json({ message: "Something went wrong" });
+    }
+
+    bcrypt.compare(password, user.password, (err, result) => {
+        if(result) {
+            let token = jwt.sign({email: email, userid: user._id}, secret)
+            res.cookie("token", token)
+            res.status(200).send("Login successful");
+        } else {
+            res.status(400).send("Invalid credentials");
+            res.redirect("/login")
+        }
+    })
+})
+
+function isLoggedIn(req, res, next) {
+    if(req.cookies.token === undefined) {
+        return res.status(401).json({ message: "Unauthorized" });
+    } else {
+        let data = jwt.verify(req.cookies.token, secret)
+        req.user = data
+    }
+    next()
+}
+
+
+
 
 app.listen(3000, () => {
     console.log("Server is running on port 3000");
